@@ -17,5 +17,16 @@ export default async function EditMemberPage({
 
   if (!member) notFound();
 
-  return <EditMemberClient member={member} />;
+  // 교수인 경우 professor_details도 가져오기
+  let professorDetails = null;
+  if (member.role === "professor") {
+    const { data } = await supabase
+      .from("professor_details")
+      .select("*")
+      .eq("member_id", id)
+      .order("display_order", { ascending: true });
+    professorDetails = data;
+  }
+
+  return <EditMemberClient member={member} professorDetails={professorDetails} />;
 }

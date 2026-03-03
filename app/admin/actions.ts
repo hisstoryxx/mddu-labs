@@ -83,6 +83,46 @@ export async function deleteMember(id: string) {
 }
 
 // ============================================
+// PROFESSOR DETAILS
+// ============================================
+
+export async function updateProfessorDetails(
+  memberId: string,
+  sections: {
+    id?: string;
+    section_type: string;
+    items: string[] | Record<string, string[]>;
+    display_order: number;
+  }[]
+) {
+  const supabase = await createClient();
+
+  // 기존 details 삭제 후 재삽입
+  const { error: deleteError } = await supabase
+    .from("professor_details")
+    .delete()
+    .eq("member_id", memberId);
+  if (deleteError) throw new Error(deleteError.message);
+
+  if (sections.length > 0) {
+    const rows = sections.map((s) => ({
+      member_id: memberId,
+      section_type: s.section_type,
+      items: s.items,
+      display_order: s.display_order,
+    }));
+
+    const { error: insertError } = await supabase
+      .from("professor_details")
+      .insert(rows);
+    if (insertError) throw new Error(insertError.message);
+  }
+
+  revalidatePath("/members");
+  revalidatePath("/admin/members");
+}
+
+// ============================================
 // PUBLICATIONS
 // ============================================
 
