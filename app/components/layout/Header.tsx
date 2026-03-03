@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useState, useEffect } from "react";
+import { usePathname } from "next/navigation";
 import { Menu, X } from "lucide-react";
 import { cn } from "@/lib/utils/cn";
 import MobileMenu from "./MobileMenu";
@@ -18,6 +19,11 @@ const navItems = [
 export default function Header() {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileOpen, setIsMobileOpen] = useState(false);
+  const pathname = usePathname();
+  const isHome = pathname === "/";
+
+  // 홈이 아닌 페이지에서는 항상 solid 스타일
+  const isSolid = !isHome || isScrolled;
 
   useEffect(() => {
     const handleScroll = () => setIsScrolled(window.scrollY > 20);
@@ -30,7 +36,7 @@ export default function Header() {
       <header
         className={cn(
           "fixed top-0 left-0 right-0 z-50 transition-all duration-300",
-          isScrolled
+          isSolid
             ? "bg-white/80 backdrop-blur-lg shadow-sm border-b border-border"
             : "bg-transparent"
         )}
@@ -41,7 +47,7 @@ export default function Header() {
               <span
                 className={cn(
                   "text-lg font-bold tracking-tight transition-colors",
-                  isScrolled ? "text-yonsei-blue" : "text-white"
+                  isSolid ? "text-yonsei-blue" : "text-white"
                 )}
               >
                 MDDU
@@ -49,7 +55,7 @@ export default function Header() {
               <span
                 className={cn(
                   "hidden sm:block text-xs transition-colors",
-                  isScrolled ? "text-text-secondary" : "text-white/80"
+                  isSolid ? "text-text-secondary" : "text-white/80"
                 )}
               >
                 Medical Device Design & Usability Lab
@@ -63,7 +69,7 @@ export default function Header() {
                   href={item.href}
                   className={cn(
                     "px-4 py-2 text-sm font-medium rounded-lg transition-colors",
-                    isScrolled
+                    isSolid
                       ? "text-text-secondary hover:text-yonsei-blue hover:bg-accent-light"
                       : "text-white/90 hover:text-white hover:bg-white/10"
                   )}
@@ -77,7 +83,7 @@ export default function Header() {
               onClick={() => setIsMobileOpen(true)}
               className={cn(
                 "lg:hidden p-2 rounded-lg transition-colors",
-                isScrolled
+                isSolid
                   ? "text-text-primary hover:bg-gray-100"
                   : "text-white hover:bg-white/10"
               )}
