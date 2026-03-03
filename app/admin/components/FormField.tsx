@@ -46,7 +46,7 @@ export default function FormField({
         <select
           id={name}
           name={name}
-          value={value}
+          defaultValue={value}
           onChange={onChange}
           required={required}
           className={inputClasses}
@@ -61,7 +61,7 @@ export default function FormField({
         <textarea
           id={name}
           name={name}
-          value={value}
+          defaultValue={value}
           onChange={onChange}
           required={required}
           placeholder={placeholder}
@@ -73,7 +73,7 @@ export default function FormField({
           id={name}
           name={name}
           type={type}
-          value={value}
+          defaultValue={value}
           onChange={onChange}
           required={required}
           placeholder={placeholder}

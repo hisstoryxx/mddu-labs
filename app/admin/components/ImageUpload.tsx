@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useCallback } from "react";
+import { useState, useCallback, useMemo } from "react";
 import { Upload, X } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 
@@ -17,7 +17,8 @@ export default function ImageUpload({
 }: ImageUploadProps) {
   const [uploading, setUploading] = useState(false);
   const [preview, setPreview] = useState<string | null>(currentUrl || null);
-  const supabase = createClient();
+  const [error, setError] = useState<string | null>(null);
+  const supabase = useMemo(() => createClient(), []);
 
   const handleUpload = useCallback(
     async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -25,15 +26,18 @@ export default function ImageUpload({
       if (!file) return;
 
       setUploading(true);
-      const ext = file.name.split(".").pop();
+      setError(null);
+
+      const ext = file.name.split(".").pop()?.toLowerCase();
       const fileName = `${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`;
 
-      const { error } = await supabase.storage
+      const { error: uploadError } = await supabase.storage
         .from(bucket)
         .upload(fileName, file, { upsert: true });
 
-      if (error) {
-        console.error("Upload error:", error);
+      if (uploadError) {
+        console.error("Upload error:", uploadError);
+        setError(`업로드 실패: ${uploadError.message}`);
         setUploading(false);
         return;
       }
@@ -83,6 +87,10 @@ export default function ImageUpload({
           className="hidden"
         />
       </label>
+
+      {error && (
+        <p className="text-sm text-red-500">{error}</p>
+      )}
     </div>
   );
 }

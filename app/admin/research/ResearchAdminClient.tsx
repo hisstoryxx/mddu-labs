@@ -45,31 +45,43 @@ export default function ResearchAdminClient({ projects }: Props) {
   );
   const [loading, setLoading] = useState(false);
   const [imageUrl, setImageUrl] = useState("");
+  const [error, setError] = useState<string | null>(null);
 
   const handleSave = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setLoading(true);
-    const formData = new FormData(e.currentTarget);
-    formData.set("image_url", imageUrl);
-    if (editTarget) {
-      await updateResearch(editTarget.id, formData);
-    } else {
-      await createResearch(formData);
+    setError(null);
+    try {
+      const formData = new FormData(e.currentTarget);
+      formData.set("image_url", imageUrl);
+      if (editTarget) {
+        await updateResearch(editTarget.id, formData);
+      } else {
+        await createResearch(formData);
+      }
+      setEditTarget(null);
+      setIsCreating(false);
+      setImageUrl("");
+      router.refresh();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "저장에 실패했습니다.");
+    } finally {
+      setLoading(false);
     }
-    setEditTarget(null);
-    setIsCreating(false);
-    setImageUrl("");
-    setLoading(false);
-    router.refresh();
   };
 
   const handleDelete = async () => {
     if (!deleteTarget) return;
     setLoading(true);
-    await deleteResearch(deleteTarget.id);
-    setDeleteTarget(null);
-    setLoading(false);
-    router.refresh();
+    try {
+      await deleteResearch(deleteTarget.id);
+      setDeleteTarget(null);
+      router.refresh();
+    } catch (err) {
+      alert(err instanceof Error ? err.message : "삭제에 실패했습니다.");
+    } finally {
+      setLoading(false);
+    }
   };
 
   const openEdit = (p: ResearchProject) => {
@@ -136,10 +148,14 @@ export default function ResearchAdminClient({ projects }: Props) {
         onClose={() => {
           setEditTarget(null);
           setIsCreating(false);
+          setError(null);
         }}
         title={editTarget ? "연구 수정" : "새 연구 추가"}
       >
-        <form onSubmit={handleSave} className="space-y-4">
+        <form key={editTarget?.id || "new"} onSubmit={handleSave} className="space-y-4">
+          {error && (
+            <p className="text-sm text-red-500 bg-red-50 px-3 py-2 rounded-lg">{error}</p>
+          )}
           <FormField
             label="제목"
             name="title"
