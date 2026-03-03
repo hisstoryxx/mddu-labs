@@ -46,8 +46,7 @@ export default function FormField({
         <select
           id={name}
           name={name}
-          defaultValue={value}
-          onChange={onChange}
+          {...(onChange ? { value, onChange } : { defaultValue: value })}
           required={required}
           className={inputClasses}
         >
@@ -61,8 +60,7 @@ export default function FormField({
         <textarea
           id={name}
           name={name}
-          defaultValue={value}
-          onChange={onChange}
+          {...(onChange ? { value, onChange } : { defaultValue: value })}
           required={required}
           placeholder={placeholder}
           rows={4}
@@ -73,8 +71,7 @@ export default function FormField({
           id={name}
           name={name}
           type={type}
-          defaultValue={value}
-          onChange={onChange}
+          {...(onChange ? { value, onChange } : { defaultValue: value })}
           required={required}
           placeholder={placeholder}
           className={inputClasses}

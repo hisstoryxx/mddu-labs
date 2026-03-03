@@ -23,6 +23,12 @@ const roleOptions = [
 export default function MemberForm({ member, onSubmit }: MemberFormProps) {
   const [loading, setLoading] = useState(false);
   const [photoUrl, setPhotoUrl] = useState(member?.photo_url || "");
+  const [role, setRole] = useState<string>(member?.role || "ms");
+
+  const isProfessor = role === "professor";
+  const isAlumni = role === "alumni";
+  const isIntern = role === "intern";
+  const isStudent = ["phd", "ms_phd", "ms"].includes(role);
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -60,7 +66,8 @@ export default function MemberForm({ member, onSubmit }: MemberFormProps) {
         name="role"
         required
         options={roleOptions}
-        value={member?.role || "ms"}
+        value={role}
+        onChange={(e) => setRole(e.target.value)}
       />
 
       <div>
@@ -82,12 +89,15 @@ export default function MemberForm({ member, onSubmit }: MemberFormProps) {
         value={member?.email || ""}
       />
 
-      <FormField
-        label="과정 라벨"
-        name="course_label"
-        value={member?.course_label || ""}
-        placeholder="MS course, Ph.D course, etc."
-      />
+      {/* 교수가 아닌 학생일 때만 표시 */}
+      {isStudent && (
+        <FormField
+          label="과정 라벨"
+          name="course_label"
+          value={member?.course_label || ""}
+          placeholder="MS course, Ph.D course, etc."
+        />
+      )}
 
       <FormField
         label="소개"
@@ -103,33 +113,43 @@ export default function MemberForm({ member, onSubmit }: MemberFormProps) {
         placeholder="UX/UI Design, Usability Engineering"
       />
 
-      <FormField
-        label="학력 (줄바꿈으로 구분)"
-        name="education"
-        value={member?.education?.join("\n") || ""}
-        textarea
-        placeholder="Bachelor in Engineering, University (2020)"
-      />
+      {/* 교수가 아닐 때만 학력 표시 */}
+      {!isProfessor && (
+        <FormField
+          label="학력 (줄바꿈으로 구분)"
+          name="education"
+          value={member?.education?.join("\n") || ""}
+          textarea
+          placeholder="Bachelor in Engineering, University (2020)"
+        />
+      )}
 
-      <FormField
-        label="논문 제목 (졸업생)"
-        name="dissertation_title"
-        value={member?.dissertation_title || ""}
-        textarea
-      />
+      {/* 졸업생일 때만 표시 */}
+      {isAlumni && (
+        <>
+          <FormField
+            label="논문 제목"
+            name="dissertation_title"
+            value={member?.dissertation_title || ""}
+            textarea
+          />
+          <FormField
+            label="현 소속"
+            name="affiliation"
+            value={member?.affiliation || ""}
+          />
+        </>
+      )}
 
-      <FormField
-        label="소속 (졸업생)"
-        name="affiliation"
-        value={member?.affiliation || ""}
-      />
-
-      <FormField
-        label="재학 기간 (인턴)"
-        name="period"
-        value={member?.period || ""}
-        placeholder="2020.07.01 ~ 2020.12.31"
-      />
+      {/* 인턴일 때만 표시 */}
+      {isIntern && (
+        <FormField
+          label="재학 기간"
+          name="period"
+          value={member?.period || ""}
+          placeholder="2020.07.01 ~ 2020.12.31"
+        />
+      )}
 
       <div className="grid grid-cols-2 gap-4">
         <FormField
