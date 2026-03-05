@@ -1,8 +1,10 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
+import { Suspense } from "react";
 import Header from "@/app/components/layout/Header";
 import Footer from "@/app/components/layout/Footer";
+import NavigationProgress from "@/app/components/layout/NavigationProgress";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -43,6 +45,9 @@ export default function RootLayout({
   return (
     <html lang="ko" className={inter.variable}>
       <body className="min-h-screen flex flex-col">
+        <Suspense fallback={null}>
+          <NavigationProgress />
+        </Suspense>
         <Header />
         <main className="flex-1">{children}</main>
         <Footer />
